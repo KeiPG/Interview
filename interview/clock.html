@@ -1,0 +1,80 @@
+<html>
+	<body>
+
+		<canvas id="canvas" width="500" height="500" >
+		
+		</canvas>
+
+		<script>
+		var canvas = document.getElementById("canvas");//creates a canvas
+		var ctx = canvas.getContext("2d");//Creates a 2d object on the canvas
+		var radius = (canvas.height / 2);//creates a variable for the radius of the clock
+		ctx.translate(radius, radius);//makes the center of the clock 0,0
+		radius = radius-3;//this is to let the clock fit in the canvas better
+		setInterval(drawClock, 1000);//this sets an interval to call drawclock every 1000 miliseconds(1 second)
+		
+		function drawClock() {// this function calls each of the draws
+			drawFace(ctx, radius);//this calls the drawFace function that draws the circle of the clock face
+			drawNumbers(ctx, radius);// this calls the drawNumbers function that adds the number to the clock face
+			drawTime(ctx, radius);// this calls the drawTime function that adds the hands to the clock 
+		}
+
+		function drawFace(ctx, radius) {// this function draws the face of the clock (it also draws over the past clock to clear it others wise there is alot of hands)
+			ctx.beginPath();
+			ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+			ctx.fillStyle = 'white';
+			ctx.fill();// this adds the white circle that the hands and number are placed on
+			
+			ctx.stroke();// this draws the white circle
+			
+			ctx.beginPath();
+			ctx.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
+			ctx.fillStyle = 'black';
+			ctx.fill();// this adds the black circle in the middle of the clock
+		}
+		function drawNumbers(ctx, radius) {//this function adds the numbers to the clock face
+			var ang;// ang is for the angle
+			ctx.font = radius * 0.15 + "px arial";// sets the font to 15% of the radius of the circle
+			ctx.textBaseline = "middle";
+			ctx.textAlign = "center";//text alignment 
+			for(var i = 1; i < 13; i++){// this for loops start at 1 and ends at 12 because we use i for the numbers around the clock
+				ang = i * Math.PI / 6;// this finds the angle of the number(as pi is half a rotation if we times it by the number we are at and divide it by 6 it gives us the location of the number)
+				ctx.rotate(ang);//rotates to face where it need to go
+				ctx.translate(0, -radius * 0.85);//go out to where it needs to go
+				ctx.rotate(-ang);// rotates back to flat to write the number otherwise the numbers come out a strange angles and upsidedown
+				ctx.fillText(i.toString(), 0, 0);// writes out the number
+				ctx.rotate(ang);//rotates back to the angle it was at
+				ctx.translate(0, radius * 0.85);//goes back to the center
+				ctx.rotate(-ang);// strightens up
+			}
+		}
+		function drawTime(ctx, radius){// this function figures out the current time
+			var now = new Date();// gets the current time
+			var hour = now.getHours();// saves the hours, minutes and second into there own variable
+			var minute = now.getMinutes();
+			var second = now.getSeconds();
+			//hour
+			hour = hour%12;// divides hours by 12 to get a percentage of the circle
+			hour = (hour*Math.PI/6)+(minute*Math.PI/(6*60))+(second*Math.PI/(360*60));// 
+			drawHand(ctx, hour, radius*0.5, radius*0.07);//figures out where to place and places the hour hand
+			//minute
+			minute = (minute*Math.PI/30)+(second*Math.PI/(30*60));
+			drawHand(ctx, minute, radius*0.8, radius*0.07);//figures out where to place and places the minute hand
+			// second
+			second = (second*Math.PI/30);
+			drawHand(ctx, second, radius*0.9, radius*0.02);//figures out where to place and places the second hand
+		}
+		function drawHand(ctx, pos, length, width) {// this function places the hands of the clock
+			ctx.beginPath();
+			ctx.lineWidth = width;
+			ctx.lineCap = "round";
+			ctx.moveTo(0,0);
+			ctx.rotate(pos);
+			ctx.lineTo(0, -length);
+			ctx.stroke();
+			ctx.rotate(-pos);
+		}
+		</script>
+
+	</body>
+</html>
